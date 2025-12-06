@@ -1,37 +1,31 @@
 import { useState } from "react";
+import { useWeather } from "../hooks/useWeather.js";
+import CurrentWeatherCard from "../components/weather/CurrentWeatherCard.jsx";
 import SearchBar from "../components/weather/SearchBar.jsx";
 import UnitsToggle from "../components/weather/UnitsToggle.jsx";
-import DailyForecastList from "../components/weather/DailyForecastList.jsx";
-import { useWeather } from "../hooks/useWeather.js";
 
 // Bootstrap imports
 import Spinner from 'react-bootstrap/Spinner';
 
 /**
- * WeekPage:
- *  - Manages city, units, and selected day index.
- *  - Uses useWeather to load daily forecast.
- *  - Maps over daily data to render a 7-day forecast grid.
+ * Initial Today page.
+ * Static content just to validate layout, JSX and styling.
  */
-export default function WeekPage() {
+
+function TodayPage() {
+  // Object deconstruction to get state and updater function
   const [city, setCity] = useState("London");
   const [units, setUnits] = useState("metric");
-  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
+  // Call the hook similar to how we call the react hooks
   const weatherState = useWeather(city, units);
 
   const handleSearch = (newCity) => {
     setCity(newCity);
-    setSelectedDayIndex(0);
   };
 
   const handleUnitsChange = (newUnits) => {
     setUnits(newUnits);
-    setSelectedDayIndex(0);
-  };
-
-  const handleSelectDay = (index) => {
-    setSelectedDayIndex(index);
   };
 
   return (
@@ -43,7 +37,7 @@ export default function WeekPage() {
         </div>
 
         <p style={{ marginTop: "0.75rem", fontSize: "0.9rem" }}>
-          7-day forecast for <strong>{city}</strong> ({units} units).
+          Showing weather for <strong>{city}</strong> ({units} units).
         </p>
 
         {weatherState.error && <p style={{ color: "#f97373" }}>{weatherState.error}</p>}
@@ -52,16 +46,14 @@ export default function WeekPage() {
       {weatherState.loading ? (
         <Spinner animation="border" />
       ) : (
-        <DailyForecastList
-          daily={weatherState.daily}
+        <CurrentWeatherCard
+          current={weatherState.current}
+          location={weatherState.location}
           units={units}
-          onSelectDay={handleSelectDay}
-          selectedIndex={selectedDayIndex}
         />
       )}
-
-      {/* HomeWork: Implement the HourlyForecastList */}
-      {/* e.g. <HourlyForecastList dailyIndex={selectedDayIndex} hourly={weatherState.hourly} /> */}
     </section>
   );
 }
+
+export default TodayPage;
